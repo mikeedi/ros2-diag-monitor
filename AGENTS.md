@@ -21,7 +21,7 @@ uv sync
 # Run
 uv run diag-monitor
 
-# Run tests (all 9 tests, no ROS2 environment needed)
+# Run tests (no ROS2 environment needed)
 uv run pytest
 
 # Run a single test
