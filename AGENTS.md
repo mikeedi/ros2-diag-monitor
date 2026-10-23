@@ -55,6 +55,10 @@ CLI (`cli.py`) → orchestrates startup and shutdown
 
 **Level constants:** `store.py` defines `LEVEL_OK=0`, `LEVEL_WARN=1`, `LEVEL_ERROR=2`, and `LEVEL_STALE=3`.
 
+**Diagnostic identity:** store/history/tree keys are `(name, hardware_id)` tuples
+(`DiagnosticKey`). `ItemList.selected_key` selects the exact device; labels show
+hardware IDs. Sources with the same name and hardware ID remain indistinguishable.
+
 ## Testing
 
 Tests mock `rclpy`, so no ROS2 environment is required to run them. `pytest` is configured in `pyproject.toml` to disable ROS2/ament pytest plugins (`-p no:launch_testing`, etc.), which keeps test runs clean outside colcon workspaces.
