@@ -87,4 +87,4 @@ class ItemList(Tree[DiagnosticKey]):
 
         if selected_moved and selected in self._leaves:
             self._leaves[selected].parent.expand()
-            self.call_after_refresh(self.move_cursor, self._leaves[selected])
+            self.call_after_refresh(self.select_node, self._leaves[selected])
