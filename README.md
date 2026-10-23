@@ -59,6 +59,8 @@ diag-monitor --history-key fault_code
 
 History and JSONL record the first observation and changes in level, message,
 hardware ID, or cause fields (`status`, `state`, `reason`, `error`, `error_code`).
+The details pane shows the latest received report; history preserves event-time
+snapshots under `History (state / cause changes)`.
 Changes only in untracked fields, such as numeric frequency/time values, do not create events. Message changes always create events. Repeat `--history-key`
 to choose a different set of cause fields. Each event preserves the hardware ID
 and the full ordered `values` array as `{key, value}` pairs, including duplicate

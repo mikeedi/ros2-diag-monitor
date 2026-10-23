@@ -20,7 +20,7 @@ class HistoryView(Static):
             self.update("[dim]No history[/]")
             return
 
-        lines: list[str] = ["[bold]History:[/]"]
+        lines: list[str] = ["[bold]History (state / cause changes):[/]"]
         for change in reversed(changes):
             time_str = change.timestamp.strftime("%H:%M:%S")
             new_style = _LEVEL_STYLES.get(change.new_level, "white")

@@ -60,6 +60,7 @@ async def test_history_renders_initial_and_same_level_causes_literally():
         await pilot.pause()
         app._refresh_ui()
         text = str(app.query_one("#history-view").visual)
+        assert "History (state / cause changes)" in text
         assert "NotReceived" in text and "Timeout" in text
         assert "details changed" in text and "first seen" in text
         assert "5 [Hz]" in text
