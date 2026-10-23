@@ -21,6 +21,7 @@ A terminal UI for monitoring ROS2 diagnostics over SSH.
 
 - Python >= 3.10 (must match your ROS2 distribution's Python)
 - ROS2 environment with `rclpy` available
+- Textual >= 0.57 for terminal clipboard support
 
 ## Install
 
