@@ -22,8 +22,9 @@ class LogWriter:
         record = {
             "timestamp": change.timestamp.isoformat(timespec="seconds"),
             "name": name,
-            "prev": LEVEL_NAMES.get(change.prev_level) if change.prev_level is not None else None,
-            "new": LEVEL_NAMES[change.new_level],
+            "prev": LEVEL_NAMES.get(change.prev_level, str(change.prev_level))
+            if change.prev_level is not None else None,
+            "new": LEVEL_NAMES.get(change.new_level, str(change.new_level)),
             "message": change.message,
         }
         try:

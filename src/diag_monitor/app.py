@@ -1,4 +1,5 @@
 from datetime import datetime
+from inspect import signature
 
 from rich.markup import escape
 from textual.app import App, ComposeResult
@@ -72,6 +73,7 @@ class DiagMonitorApp(App):
         self._no_data_notified: bool = False
         self._monitor_start: datetime = datetime.now()
         self._filter_text: str = ""
+        self._notified_failures: dict[str, str | None] = {}
 
     def compose(self) -> ComposeResult:
         topic = self._ros_bridge.topic if self._ros_bridge else "/diagnostics"
@@ -105,14 +107,25 @@ class DiagMonitorApp(App):
             header_text += f"  \u26a0 {warn_count}"
         if error_count:
             header_text += f"  \u2717 {error_count}"
-        if self._filter_text:
-            header_text += f"  \u2502  Filter: {escape(self._filter_text)}"
         receiver_error = getattr(self._ros_bridge, "receiver_error", None)
         logging_error = getattr(self._ros_bridge, "logging_error", None)
-        if logging_error:
-            header_text = f"Logging failed: {escape(logging_error)} |{header_text}"
-        if receiver_error:
-            header_text = f"Receiver stopped: {escape(receiver_error)} |{header_text}"
+        for key, error, marker, title, severity in (
+            ("logging", logging_error, "LOG FAILED", "Logging failed", "warning"),
+            ("receiver", receiver_error, "RX STOPPED", "Receiver stopped", "error"),
+        ):
+            if error:
+                header_text += f"  {marker}"
+                if error != self._notified_failures.get(key):
+                    if "markup" in signature(self.notify).parameters:
+                        self.notify(f"{title}: {error}", severity=severity, timeout=10, markup=False)
+                    else:
+                        # Textual 0.50 uses Rich markup and has no markup option.
+                        # A closing tag preserves escaped trailing backslashes.
+                        message = escape(f"{title}: {error}")
+                        self.notify(f"[none]{message}[/]", severity=severity, timeout=10)
+            self._notified_failures[key] = error
+        if self._filter_text:
+            header_text += f"  \u2502  Filter: {escape(self._filter_text)}"
         header = self.query_one("#header", Static)
         header.update(header_text)
 
@@ -149,7 +162,7 @@ class DiagMonitorApp(App):
             history_view.show_history(None)
 
         # No-data timeout: suggest switching to /diagnostics
-        if not self._no_data_notified and self._ros_bridge is not None:
+        if not receiver_error and not self._no_data_notified and self._ros_bridge is not None:
             last = self._store.last_msg_time
             ref = last if last is not None else self._monitor_start
             elapsed = (datetime.now() - ref).total_seconds()
