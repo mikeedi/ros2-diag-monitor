@@ -1,7 +1,8 @@
 import pytest
+from textual.widgets import Static
 
-from diag_monitor.app import DiagMonitorApp
-from diag_monitor.store import DiagStore
+from diag_monitor.app import DiagMonitorApp, HelpScreen
+from diag_monitor.store import DiagStore, LEVEL_ERROR, LEVEL_OK
 
 
 def make_store():
@@ -88,3 +89,31 @@ async def test_copy_contains_all_literal_fields_and_duplicate_keys(monkeypatch):
         await pilot.press("c")
         assert app.query_one("#filter-input").value == "c"
         assert len(copied) == 1
+
+
+async def test_history_message_is_rendered_literally():
+    """History keeps bracketed units in transition messages."""
+    store = DiagStore()
+    store.update("sensor", LEVEL_OK, "OK", "device", [])
+    store.update("sensor", LEVEL_ERROR, "rate 20 [Hz] too low", "device", [])
+    app = DiagMonitorApp(store)
+    async with app.run_test(size=(120, 40)) as pilot:
+        await select_sensor(app, pilot)
+        text = str(app.query_one("#history-view", Static).visual)
+        assert "rate 20 [Hz] too low" in text
+
+
+@pytest.mark.parametrize("size", [(120, 40), (80, 24), (50, 20)])
+async def test_help_lists_pane_scroll_keys(size):
+    """Help lists the pane-scroll keys documented in README at supported sizes."""
+    app = DiagMonitorApp(DiagStore())
+    async with app.run_test(size=size) as pilot:
+        await pilot.press("?")
+        await pilot.pause()
+        assert isinstance(app.screen, HelpScreen)
+        text = str(app.screen.query_one("#help-dialog Static", Static).visual)
+        assert "Copy selected diagnostic" in text
+        screenshot = app.export_screenshot()
+        for key in ("PageUp", "PageDown", "Home", "End"):
+            assert key in text, f"{key} missing from help"
+            assert key in screenshot, f"{key} is clipped in help at {size}"

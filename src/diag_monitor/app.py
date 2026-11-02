@@ -46,6 +46,8 @@ class HelpScreen(ModalScreen):
                 "  [b]Tab[/b]       Switch pane\n"
                 "  [b]c[/b]         Copy selected diagnostic\n"
                 "  [b]\u2191[/b] [b]\u2193[/b]       Navigate\n"
+                "  [b]PageUp[/b] [b]PageDown[/b]  Scroll pane\n"
+                "  [b]Home[/b] [b]End[/b]     Pane top / bottom\n"
                 "  [b]q[/b]         Quit\n"
                 "\n"
                 "Press [b]Esc[/b] or [b]?[/b] to close"

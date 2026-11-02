@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from rich.markup import escape
+from rich.text import Text
 from textual.widgets import Static
 
 from diag_monitor.store import StatusChange, LEVEL_NAMES, LEVEL_OK, LEVEL_WARN, LEVEL_ERROR, LEVEL_STALE
@@ -31,7 +33,7 @@ class HistoryView(Static):
                 prev_name = LEVEL_NAMES.get(change.prev_level, "?")
                 lines.append(
                     f"  {time_str}  [{prev_style}]{prev_name}[/] -> [{new_style}]{new_name}[/]"
-                    f"  {change.message}"
+                    f"  {escape(change.message)}"
                 )
 
-        self.update("\n".join(lines))
+        self.update(Text.from_markup("\n".join(lines)))
